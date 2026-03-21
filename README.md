@@ -6,7 +6,9 @@ BD-UN-JB is RemoteJarLoader that can be used on already jailbroken PS5 upto 12.0
 It supports on-screen logging and network logging.  
 
 Send bdj_unpatch.elf to elfldr to unpatch BD-J.  
-Then burn BD-UN-JB iso.  
+bdj_unpatch.elf will backup existing bdjstack.jar to bdjstack.jar.bak just in case.  
+
+Then burn BD-UN-JB iso and run.  
 
 **DO NOT REINSTALL FW, IT WILL WIPE THE PATCH AND LOSE BD-JB**
 
