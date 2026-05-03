@@ -6,3 +6,4 @@ META-INF/
 **/*.class
 **/*.jar
 payloads/**/*.jar
+src/org/bdj/Version.java
