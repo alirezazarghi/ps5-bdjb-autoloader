@@ -15,7 +15,7 @@
 # <http://www.gnu.org/licenses/>.
 
 
-DISC_LABEL := BD-UN-JB
+DISC_LABEL := ps5-bd-jb-autoloader
 
 #
 # Host tools

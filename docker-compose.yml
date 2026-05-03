@@ -3,7 +3,7 @@ services:
   builder:
     build: .
     volumes:
-      - ..:/workspace  # Mount parent directory so BDJSDK_HOME (../../) resolves to /BD-UN-JB/
+      - ..:/workspace  # Mount parent directory so BDJSDK_HOME (../../) resolves to /ps5-bd-jb-autoloader/
     working_dir: /workspace/ps5_bdunjb_autoloader
     command:
       - /bin/bash
@@ -30,7 +30,7 @@ services:
         make all
 
         echo ''
-        echo 'Done! If successful, BD-UN-JB.iso should be in the current directory.'
+        echo 'Done! If successful, ps5-bd-jb-autoloader.iso should be in the current directory.'
 
 volumes:
   makefs-cache:

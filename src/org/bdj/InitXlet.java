@@ -17,8 +17,6 @@ import org.bdj.sandbox.ExploitInternal;
 public class InitXlet implements Xlet {
     private HScene scene;
     private Screen screen;
-    private RemoteJarLoader jarLoader;
-    private Thread jarLoaderThread;
     private InternalJarLoader internalJarLoader;
     private Thread internalJarLoaderThread;
     private final String jarLoaderThreadName = "JarLoader";
@@ -54,33 +52,25 @@ public class InitXlet implements Xlet {
                 ? "Exploit success - sandbox escape achieved"
                 : "Exploit failed - sandbox still active");
 
+            // Warm up network stack to prevent dlopen failures in dynamic JARs
+            try {
+                Status.println("Warming up network stack...");
+                InetAddress.getByName("127.0.0.1");
+            } catch (Throwable ignored) {}
+
         } catch (Exception e) {
             Status.printStackTrace("Error when disabling sandbox: ", e);
         }
         
         // Add sanity check
         if (System.getSecurityManager() == null) {
-            
-            boolean UseInternalJar = false;
-
-            if (!UseInternalJar) {
-                try {
-                    jarLoader = new RemoteJarLoader();
-                    jarLoaderThread = new Thread(jarLoader, jarLoaderThreadName);
-                    jarLoaderThread.start();
-                } catch (Throwable e) {
-                    Status.printStackTrace("Loader startup failed", e);
-                }
-            } else {
-                try {
-                    internalJarLoader = new InternalJarLoader();
-                    internalJarLoaderThread = new Thread(internalJarLoader, jarLoaderThreadName);
-                    internalJarLoaderThread.start();
-                } catch (Throwable e) {
-                    Status.printStackTrace("Loader startup failed", e);
-                }
+            try {
+                internalJarLoader = new InternalJarLoader();
+                internalJarLoaderThread = new Thread(internalJarLoader, jarLoaderThreadName);
+                internalJarLoaderThread.start();
+            } catch (Throwable e) {
+                Status.printStackTrace("Loader startup failed", e);
             }
-            
         } else {
             Status.println("Sandbox is still activated");
         }
@@ -96,32 +86,6 @@ public class InitXlet implements Xlet {
         scene = null;
     }
     
-    private void disableFileProxies() {        
-        try {
-            Class bdjFactoryClass = Class.forName("com.oracle.orbis.io.BDJFactory");
-            
-            Field instanceField = bdjFactoryClass.getDeclaredField("instance");
-            instanceField.setAccessible(true);
-            
-            Object currentInstance = instanceField.get(null);
-            Status.println("Current BDJFactory instance: " + 
-                (currentInstance != null ? currentInstance.getClass().getName() : "null"));
-            
-            // Null out the instance - this will make needProxy() return false
-            instanceField.set(null, null);
-            Status.println("BDJFactory instance set to null");
-            
-            Object newInstance = instanceField.get(null);
-            Status.println("New BDJFactory instance: " + 
-                (newInstance != null ? newInstance.getClass().getName() : "null"));
-            
-            Status.println("Setting java.io.tmpdir to /download0/BD_BUDA/javatmp");
-            System.setProperty("java.io.tmpdir", "/download0/BD_BUDA/javatmp");
-            
-        } catch (Exception e) {
-            Status.printStackTrace("Error disabling BDJFactory", e);
-        }
-    }
     
 }
 

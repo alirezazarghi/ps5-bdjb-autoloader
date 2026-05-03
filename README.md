@@ -1,14 +1,13 @@
-# BD-UN-JB
+# PS5 BD-JB Autoloader
 
 **Note : YOU NEED ALREADY JAILBROKEN PS5**
 
-BD-UN-JB is RemoteJarLoader that can be used on already jailbroken PS5 upto 13.20 firmware.   
-It supports on-screen logging and network logging.  
+PS5 BD-JB Autoloader is an automated payload loader for jailbroken PS5 consoles. It chains the `poops` kernel exploit with an `autoloader` module that automatically executes ELF and JAR payloads from a specified configuration.
 
-Send bdj_unpatch.elf to elfldr to unpatch BD-J.  
-bdj_unpatch.elf will backup existing bdjstack.jar to bdjstack.jar.bak just in case.  
+Send `bdj_unpatch.elf` to elfldr to unpatch BD-J.
+`bdj_unpatch.elf` will backup existing `bdjstack.jar` to `bdjstack.jar.bak` just in case.
 
-Then burn BD-UN-JB iso and run.  
+Then burn `ps5-bd-jb-autoloader.iso` and run.
 
 **DO NOT REINSTALL FW, IT WILL WIPE THE PATCH AND LOSE BD-JB**
 
@@ -42,8 +41,8 @@ Use john-tornblom's **[bdj-sdk](https://github.com/john-tornblom/bdj-sdk/)** and
 
 This project is licensed under the GPL-3.0 License.
 
-The original BD-UN-JB base code remains under its original MIT License (see LICENSE-MIT).
-All unique modifications and additions in this fork are licensed under GPL-3.0.
+The original base code remains under its original MIT License (see LICENSE-MIT).
+All unique modifications and additions in this project are licensed under GPL-3.0.
 
 
 

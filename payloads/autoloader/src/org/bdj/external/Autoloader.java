@@ -81,10 +81,7 @@ public class Autoloader {
 
         Status.println("Autoloader finished.");
         
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ignored) {}
-        //killApp();
+        killApp();
     }
 
     private static String findConfig() {

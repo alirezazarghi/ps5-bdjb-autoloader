@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
+import org.bdj.api.KernelAPI;
 
 public class InternalJarLoader implements Runnable {
     
@@ -15,7 +16,26 @@ public class InternalJarLoader implements Runnable {
     
     public void run() {
         try {
-            runJar(new File("/disc/payload.jar"));
+            File poopsJar = new File("/disc/poops.jar");
+            if (poopsJar.exists()) {
+                Status.println("Loading poops.jar...");
+                runJar(poopsJar);
+            } else {
+                Status.println("poops.jar not found at /disc/poops.jar");
+            }
+            
+            // Check if jailbreak succeeded via KernelAPI
+            if (KernelAPI.getInstance().getKdataBase() != 0) {
+                File autoloaderJar = new File("/disc/autoloader.jar");
+                if (autoloaderJar.exists()) {
+                    Status.println("Jailbreak successful, loading autoloader.jar...");
+                    runJar(autoloaderJar);
+                } else {
+                    Status.println("autoloader.jar not found at /disc/autoloader.jar");
+                }
+            } else {
+                Status.println("Jailbreak not detected, skipping autoloader.jar");
+            }
         } catch (IOException e) {
             Status.printStackTrace("JarLoader error", e);
         } catch (Exception e) {
@@ -24,39 +44,62 @@ public class InternalJarLoader implements Runnable {
     }
 
     private static void runJar(File jarFile) throws Exception {
+        // Copy JAR to temp directory to avoid disc permission issues
+        File tempFile = File.createTempFile("loader", ".jar");
+        tempFile.deleteOnExit();
+        
+        Status.println("Copying JAR to " + tempFile.getAbsolutePath());
+        InputStream is = new FileInputStream(jarFile);
+        OutputStream os = new FileOutputStream(tempFile);
+        byte[] buf = new byte[8192];
+        int len;
+        while ((len = is.read(buf)) > 0) {
+            os.write(buf, 0, len);
+        }
+        is.close();
+        os.close();
+
         // Read the manifest to find the main class
-        JarFile jar = new JarFile(jarFile);
+        JarFile jar = new JarFile(tempFile);
         Manifest manifest = jar.getManifest();
         jar.close();
         
         if (manifest == null) {
+            tempFile.delete();
             throw new Exception("No manifest found in JAR");
         }
         
         String mainClassName = manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
         if (mainClassName == null) {
+            tempFile.delete();
             throw new Exception("No Main-Class specified in manifest");
         }
         
-        ClassLoader parentLoader = InternalJarLoader.class.getClassLoader();
+        final ClassLoader parentLoader = InternalJarLoader.class.getClassLoader();
         ClassLoader bypassRestrictionsLoader = new URLClassLoader(new URL[0], parentLoader) {
             protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                if (name.startsWith("java.nio") || name.startsWith("javax.security.auth") || name.startsWith("javax.net.ssl")) {
+                if (name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("jdk.")) {
                     return findSystemClass(name);
                 }
                 return super.loadClass(name, resolve);
             }
         };
         
-        URL jarUrl = jarFile.toURL();
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{jarUrl}, bypassRestrictionsLoader);
+        URL jarUrl = tempFile.toURL();
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{jarUrl}, bypassRestrictionsLoader);
         
         Class mainClass = classLoader.loadClass(mainClassName);
-        
         Method mainMethod = mainClass.getMethod("main", new Class[]{String[].class});
         
-        Status.println("Running " + mainClassName + "...");
-        mainMethod.invoke(null, new Object[]{new String[0]});
+        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            Status.println("Running " + mainClassName + "...");
+            mainMethod.invoke(null, new Object[]{new String[0]});
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldLoader);
+            tempFile.delete();
+        }
         
         Status.println(mainClassName + " execution completed");
     }
