@@ -61,6 +61,13 @@ If you want to use a "normal" ELF Loader that allows sending payloads from any d
 The autoloader includes **Payload Manager**. Using it is the most reliable way to load etaHEN/kstuff, as it closes the Disc app before sending the payloads. To use it, make `pldmgr.elf` the **only** item in your `autoload.txt`.
 </Details>
 
+<Details>
+<Summary><i>etaHEN loading stability issues</i></Summary>
+Sometimes etaHEN will fail to load. It seems that etaHEN/kstuff often won't finish loading until the Disc Player app is closed.
+
+**Recommended Solution:**  
+In default configuration, the autoloader includes Payload Manager. Using it is the most reliable way to load etaHEN/kstuff, as it waits for the Disc Player app to close before loading the payloads. To use it, make pldmgr.elf the only item in your autoload.txt.
+</Details>
 
 ## Credits
 
