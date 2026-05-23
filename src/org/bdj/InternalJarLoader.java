@@ -24,18 +24,13 @@ public class InternalJarLoader implements Runnable {
                 Status.warning("poops.jar not found at /disc/poops.jar");
             }
             
-            // Check if jailbreak succeeded via KernelAPI
-            if (KernelAPI.getInstance().getKdataBase() != 0) {
-                File autoloaderJar = new File("/disc/autoloader.jar");
-                if (autoloaderJar.exists()) {
-                    Status.success("Jailbreak successful!");
-                    Status.setProgress(80, "Starting Autoloader...");
-                    runJar(autoloaderJar);
-                } else {
-                    Status.warning("autoloader.jar not found at /disc/autoloader.jar");
-                }
+
+            File autoloaderJar = new File("/disc/autoloader.jar");
+            if (autoloaderJar.exists()) {
+                Status.setProgress(80, "Starting Autoloader...");
+                runJar(autoloaderJar);
             } else {
-                Status.error("Kernel exploit failed, skipping autoloader.jar");
+                Status.warning("autoloader.jar not found at /disc/autoloader.jar");
             }
         } catch (IOException e) {
             Status.printStackTrace("JarLoader error", e);
