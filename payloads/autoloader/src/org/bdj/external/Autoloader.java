@@ -40,6 +40,25 @@ public class Autoloader {
     }
 
     public static void main(String[] args) {
+        Status.setProgress(81, "Waiting for ELF loader...");
+        
+        boolean elfldrReady = false;
+        for (int i = 0; i < 50; i++) {
+            if (isPortOpen(9021)) {
+                elfldrReady = true;
+                break;
+            }
+            try { Thread.sleep(200); } catch (Exception ignored) {}
+        }
+        
+        if (!elfldrReady) {
+            Status.error("ELF loader failed to start on port 9021");
+            Status.setProgress(100, "Finished (ELF loader failed)");
+            try { Thread.sleep(2000); } catch (Exception ignored) {}
+            killApp();
+            return;
+        }
+
         Status.setProgress(85, "Searching for config...");
 
         String configPath = findConfig();

@@ -24,9 +24,7 @@ public class InternalJarLoader implements Runnable {
                 Status.warning("poops.jar not found at /disc/poops.jar");
             }
             
-            Status.info("poops finished. Waiting to let elfldr initialize...");
-            Thread.sleep(4000);
-            
+
             File autoloaderJar = new File("/disc/autoloader.jar");
             if (autoloaderJar.exists()) {
                 Status.setProgress(80, "Starting Autoloader...");
